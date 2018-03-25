@@ -1,0 +1,8 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "version": "1.4.1",
+    "libraryName": "f-1-results",
+    "libraryId": "a6e4cff8-c4eb-4414-b931-5a36b4728287",
+    "environment": "onprem"
+  }
+}
