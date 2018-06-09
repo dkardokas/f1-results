@@ -18,50 +18,8 @@ export default class F1Results extends React.Component<IF1ResultsProps, any> {
     this._listService = new ListService(this.props.context.spHttpClient);
     this._webUrl = this.props.context.pageContext.web.absoluteUrl;
     this.state = {
-      completedRaces: [{ id: 1, title: "AUS" }, { id: 2, title: "BAH" }],
-      allEntries: [
-        {
-          userId: 1,
-          displayName: "Dikis",
-          points_allRaces: 36,
-          raceEntries:
-            [
-              {
-                raceId: 1,
-                entry_P1: "Bob",
-                points_P1: 12,
-                entry_P2: "Jimmy",
-                points_P2: 10,
-                points_total: 22
-              },
-              {
-                raceId: 2,
-                entry_P1: "Jimbo",
-                points_P1: 3,
-                entry_P2: "Zizi",
-                points_P2: 11,
-                points_total: 14
-              },
-            ]
-        },
-
-        {
-          userId: 2,
-          displayName: "Bikis",
-          points_allRaces: 23,
-          raceEntries:
-            [
-              {
-                raceId: 1,
-                entry_P1: "Momo",
-                points_P1: 7,
-                entry_P2: "Beebee",
-                points_P2: 16,
-                points_total: 23
-              }
-            ]
-        }
-      ]
+      completedRaces: [],
+      allEntries: []
     };
 
 
@@ -71,15 +29,14 @@ export default class F1Results extends React.Component<IF1ResultsProps, any> {
 
     return (
       <div className={styles.f1Results}>
-        <div className={styles.container}>
-          <div className={styles.row}>
-            <div className={styles.column}>
-              <table id='results'>
+        <div className={styles.container}>     
+            <div id="results" className={styles.csstransforms}>
+            <table className={styles["table-header-rotated"]}>
                 <tr><th></th>
                   {this.state.completedRaces.map((element, index) => (
-                    <th>{element.title}</th>
+                    <th className={styles.rotate}><div><span>{element.title}</span></div></th>
                   ))}
-                  <th>Total</th>
+                  <th className={styles.rotate}><div><span>Total</span></div></th>
                 </tr>
                 {this.state.allEntries.map((userEntry, index) => (
                   <tr>
@@ -97,7 +54,6 @@ export default class F1Results extends React.Component<IF1ResultsProps, any> {
                   </tr>
                 ))}
               </table>
-            </div>
           </div>
         </div>
       </div>
@@ -168,3 +124,4 @@ export default class F1Results extends React.Component<IF1ResultsProps, any> {
     });
   }
 }
+// .
