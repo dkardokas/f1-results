@@ -97,7 +97,7 @@ export default class F1Results extends React.Component<IF1ResultsProps, any> {
           });
         }
         let currentUserEntry = completedEntries.filter(v => v.userId == entryFromSP.AuthorId)[0];
-        let pointsForRace = entryFromSP.Points_P1 + entryFromSP.Points_P2 + entryFromSP.Points_P3 + entryFromSP.Points_P4 + entryFromSP.Points_P5;
+        let pointsForRace = entryFromSP.P1_Points + entryFromSP.P2_Points + entryFromSP.P3_Points + entryFromSP.P4_Points + entryFromSP.P5_Points;
         currentUserEntry.raceEntries.push({
           raceId: entryFromSP.RaceId,
           entry_P1: entryFromSP.Entry_P1, 
@@ -106,11 +106,11 @@ export default class F1Results extends React.Component<IF1ResultsProps, any> {
           entry_P4: entryFromSP.Entry_P4, 
           entry_P5: entryFromSP.Entry_P5, 
 
-          points_P1: entryFromSP.Points_P1,
-          points_P2: entryFromSP.Points_P2,
-          points_P3: entryFromSP.Points_P3,
-          points_P4: entryFromSP.Points_P4,
-          points_P5: entryFromSP.Points_P5,
+          points_P1: entryFromSP.P1_Points,
+          points_P2: entryFromSP.P2_Points,
+          points_P3: entryFromSP.P3_Points,
+          points_P4: entryFromSP.P4_Points,
+          points_P5: entryFromSP.P5_Points,
           
           points_total: pointsForRace
         });
@@ -118,7 +118,7 @@ export default class F1Results extends React.Component<IF1ResultsProps, any> {
       });
       this.setState(() => {
         return { allEntries: completedEntries.sort(function (a, b) {
-          return a.points_allRaces - b.points_allRaces;
+          return b.points_allRaces - a.points_allRaces;
         })};
       });
     });
