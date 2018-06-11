@@ -74,13 +74,13 @@ export default class F1Results extends React.Component<IF1ResultsProps, any> {
         races.push({
           id: raceFromSP.Id,
           title: raceFromSP.Title
-        })
+        });
       });
 
       this.setState(() => {
         return { completedRaces: races };
       });
-    })
+    });
   }
 
   private _getCompletedEntries(){
