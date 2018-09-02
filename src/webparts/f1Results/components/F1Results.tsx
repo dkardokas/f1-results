@@ -1,14 +1,11 @@
 import * as React from 'react';
 import styles from './F1Results.module.scss';
 import { IF1ResultsProps } from './IF1ResultsProps';
-import { escape } from '@microsoft/sp-lodash-subset';
 import { ListService } from '../common/services/ListService';
-import { BasePropertyPaneControl } from '@microsoft/sp-webpart-base';
 
 export default class F1Results extends React.Component<IF1ResultsProps, any> {
   private LIST_TITLE_RACES: string = "F1_Races";
   private LIST_TITLE_ENTRIES: string = "F1_Entries";
-  private LIST_TITLE_DRIVERS: string = "F1_Drivers";
 
   private _listService: ListService;
   private _webUrl: string;
@@ -26,7 +23,6 @@ export default class F1Results extends React.Component<IF1ResultsProps, any> {
 
   }
   public render(): React.ReactElement<IF1ResultsProps> {
-    let tableHeader: React.ReactElement<any> = <table></table>;
 
     return (
       <div className={styles.f1Results}>
@@ -34,16 +30,16 @@ export default class F1Results extends React.Component<IF1ResultsProps, any> {
           <div id="results" className={styles.csstransforms}>
             <table className={styles["table-header-rotated"]}>
               <tr><th></th>
-                {this.state.completedRaces.map((element, index) => (
+                {this.state.completedRaces.map((element) => (
                   <th className={styles.rotate}><div><span>{element.title}</span></div></th>
                 ))}
                 <th className={styles.rotate}><div><span>Best {this.state.bestOf}</span></div></th>
                 <th className={styles.rotate}><div><span>Total</span></div></th>
               </tr>
-              {this.state.allEntries.map((userEntry, index) => (
+              {this.state.allEntries.map((userEntry) => (
                 <tr>
                   <td>{userEntry.displayName}</td>
-                  {this.state.completedRaces.map((race, index) => (
+                  {this.state.completedRaces.map((race) => (
                     <td>
                       {
                         userEntry.raceEntries.filter(
@@ -83,7 +79,7 @@ export default class F1Results extends React.Component<IF1ResultsProps, any> {
     let q: string = `<View><Query><Where><Eq><FieldRef Name='Points_Allocated' /><Value Type='Boolean'>1</Value></Eq></Where></Query></View>`;
 
     var races = [];
-    return new Promise<any>((resolve, reject) => {
+    return new Promise<any>((resolve) => {
       this._listService.getListItemsByQuery(this._webUrl, this.LIST_TITLE_RACES, q).then(racesFromSP => {
         racesFromSP.value.forEach(raceFromSP => {
           races.push({
