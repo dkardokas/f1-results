@@ -1,7 +1,7 @@
-import * as React from 'react';
-import styles from './F1Results.module.scss';
-import { IF1ResultsProps } from './IF1ResultsProps';
-import { ListService } from '../common/services/ListService';
+import * as React from "react";
+import styles from "./F1Results.module.scss";
+import { IF1ResultsProps } from "./IF1ResultsProps";
+import { ListService } from "../common/services/ListService";
 
 export default class F1Results extends React.Component<IF1ResultsProps, any> {
   private LIST_TITLE_RACES: string = "F1_Races";
@@ -11,7 +11,7 @@ export default class F1Results extends React.Component<IF1ResultsProps, any> {
   private _webUrl: string;
 
 
-  constructor(props) {
+  constructor(props:any) {
     super(props);
     this._listService = new ListService(this.props.context.spHttpClient);
     this._webUrl = this.props.context.pageContext.web.absoluteUrl;
@@ -33,8 +33,8 @@ export default class F1Results extends React.Component<IF1ResultsProps, any> {
                 {this.state.completedRaces.map((element) => (
                   <th className={styles.rotate}><div><span>{element.title}</span></div></th>
                 ))}
-                <th className={styles.rotate}><div><span>Best {this.state.bestOf}</span></div></th>
                 <th className={styles.rotate}><div><span>Total</span></div></th>
+                <th className={styles.rotate}><div><span>Best {this.state.bestOf}</span></div></th>
               </tr>
               {this.state.allEntries.map((userEntry) => (
                 <tr>
@@ -42,14 +42,12 @@ export default class F1Results extends React.Component<IF1ResultsProps, any> {
                   {this.state.completedRaces.map((race) => (
                     <td>
                       {
-                        userEntry.raceEntries.filter(
-                          raceEntry => raceEntry.raceId === race.id)[0] ? userEntry.raceEntries.filter(
-                            raceEntry => raceEntry.raceId === race.id)[0].points_total : ""
+                        this.getUserPointsForRace(userEntry, race)
                       }
                     </td>
-                  ))}
-                  <td>{userEntry.topEntries}</td>
+                  ))}                  
                   <td>{userEntry.points_allRaces}</td>
+                  <td>{userEntry.topEntries}</td>
                 </tr>
               ))}
             </table>
@@ -58,27 +56,43 @@ export default class F1Results extends React.Component<IF1ResultsProps, any> {
       </div>
     );
   }
-  public componentDidMount() {
-    this._getCompletedRaces().then(() =>{
-      this._getCompletedEntries();
-    });    
+  private getUserPointsForRace(userEntry: any, race: any):JSX.Element {
+    var raceEntry:any = userEntry.raceEntries.filter(raceEntry => raceEntry.raceId === race.id)[0];
+    if(!raceEntry) {
+      return null;
+    }
+    const resultStyle:React.CSSProperties = {
+      fontWeight: "bold"
+    } as React.CSSProperties;
+
+  return (<p style={raceEntry.isTopPoints ? resultStyle : null}>{raceEntry.points_total}</p>);
   }
 
-  private _getTopXPoints(userEntry, x) {
-    userEntry.raceEntries.sort(function (a, b) {
+  public componentDidMount():void {
+    this._getCompletedRaces().then(() => {
+      this._getCompletedEntries();
+    });
+  }
+
+  private _getTopXPoints(userEntry:any, x:number):number {
+    userEntry.raceEntries.sort(function (a:any, b:any):number {
       return b.points_total - a.points_total;
     });
-    let bestPoints = 0;
-    for (let i: number = 0; i < x; i++)
+    let bestPoints:number = 0;
+    for (let i: number = 0; i < x && userEntry.raceEntries[i]; i++) {
       bestPoints += userEntry.raceEntries[i].points_total;
-    return bestPoints
+      userEntry.raceEntries[i].isTopPoints = true;
+    }
+
+    return bestPoints;
   }
 
 
   private _getCompletedRaces(): Promise<any> {
-    let q: string = `<View><Query><Where><Eq><FieldRef Name='Points_Allocated' /><Value Type='Boolean'>1</Value></Eq></Where></Query></View>`;
+    let q: string = `<View><Query><Where><Eq><FieldRef Name='Points_Allocated' />
+    <Value Type='Boolean'>1</Value></Eq></Where></Query></View>`;
 
-    var races = [];
+    var races:any[] = [];
     return new Promise<any>((resolve) => {
       this._listService.getListItemsByQuery(this._webUrl, this.LIST_TITLE_RACES, q).then(racesFromSP => {
         racesFromSP.value.forEach(raceFromSP => {
@@ -89,10 +103,10 @@ export default class F1Results extends React.Component<IF1ResultsProps, any> {
         });
 
         this.setState(() => {
-          return { 
+          return {
             completedRaces: races,
-            bestOf: races.length - 2
-           };
+            bestOf: races.length - 4
+          };
         });
 
         resolve(true);
@@ -100,12 +114,12 @@ export default class F1Results extends React.Component<IF1ResultsProps, any> {
     });
   }
 
-  private _getCompletedEntries() {
+  private _getCompletedEntries():void {
     let q: string = `<View><Query><Where><Eq><FieldRef Name='ShowInResults' /><Value Type='Boolean'>1</Value></Eq></Where></Query></View>`;
-    var completedEntries = [];
+    var completedEntries:any[] = [];
     this._listService.getListItemsByQuery(this._webUrl, this.LIST_TITLE_ENTRIES, q).then(entriesFromSP => {
       entriesFromSP.value.forEach(entryFromSP => {
-        if (completedEntries.filter(v => v.userId == entryFromSP.AuthorId).length == 0) {
+        if (completedEntries.filter(v => v.userId === entryFromSP.AuthorId).length === 0) {
           completedEntries.push({
             userId: entryFromSP.AuthorId,
             displayName: entryFromSP.FieldValuesAsText.Author,
@@ -113,8 +127,13 @@ export default class F1Results extends React.Component<IF1ResultsProps, any> {
             points_allRaces: 0
           });
         }
-        let currentUserEntry = completedEntries.filter(v => v.userId == entryFromSP.AuthorId)[0];
-        let pointsForRace = entryFromSP.P1_Points + entryFromSP.P2_Points + entryFromSP.P3_Points + entryFromSP.P4_Points + entryFromSP.P5_Points;
+        let currentUserEntry:any = completedEntries.filter(v => v.userId === entryFromSP.AuthorId)[0];
+        let pointsForRace:number =
+          entryFromSP.P1_Points +
+          entryFromSP.P2_Points +
+          entryFromSP.P3_Points +
+          entryFromSP.P4_Points +
+          entryFromSP.P5_Points;
         currentUserEntry.raceEntries.push({
           raceId: entryFromSP.RaceId,
           entry_P1: entryFromSP.Entry_P1,
@@ -139,7 +158,7 @@ export default class F1Results extends React.Component<IF1ResultsProps, any> {
       });
       this.setState(() => {
         return {
-          allEntries: completedEntries.sort(function (a, b) {
+          allEntries: completedEntries.sort(function (a:any, b:any):number {
             return b.topEntries - a.topEntries;
           })
         };
